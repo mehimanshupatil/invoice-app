@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { SideDrawer } from '@/components/SideDrawer';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -31,7 +32,8 @@ export function Layout({ children }: LayoutProps) {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
+              <SideDrawer />
               <Link href="/dashboard" className="flex items-center space-x-2">
                 <Receipt className="h-8 w-8 text-blue-600" />
                 <span className="text-xl font-bold text-gray-900">Invoice Manager</span>
