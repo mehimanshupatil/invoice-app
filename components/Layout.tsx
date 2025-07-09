@@ -3,6 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { SideDrawer } from '@/components/SideDrawer';
+import { EnvironmentBanner } from '@/components/EnvironmentBanner';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -29,6 +30,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <EnvironmentBanner />
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">

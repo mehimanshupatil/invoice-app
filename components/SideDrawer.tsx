@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { config } from '@/lib/config';
 
 interface NavigationItem {
   title: string;
@@ -118,7 +119,7 @@ export function SideDrawer({ children }: SideDrawerProps) {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">Invoice Manager</h2>
-            <p className="text-blue-100 text-sm">Professional Edition</p>
+            <p className="text-blue-100 text-sm">v{config.appVersion}</p>
           </div>
         </div>
       </div>
@@ -312,10 +313,10 @@ export function SideDrawer({ children }: SideDrawerProps) {
       <div className="p-4 border-t bg-gray-50">
         <div className="text-center">
           <p className="text-xs text-gray-500">
-            Invoice Manager v2.1.0
+            {config.appName} v{config.appVersion}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            © 2024 Your Company
+            © 2024 Your Company • {config.env.toUpperCase()}
           </p>
         </div>
       </div>
