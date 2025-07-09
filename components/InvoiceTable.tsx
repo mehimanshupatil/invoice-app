@@ -59,7 +59,7 @@ import {
   FileText,
   FileSpreadsheet
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { toast } from 'sonner';
 import { Invoice, deleteInvoice } from '@/lib/invoice-data';
 import { useAuth } from '@/contexts/AuthContext';
