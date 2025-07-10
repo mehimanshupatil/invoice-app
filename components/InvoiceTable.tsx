@@ -357,7 +357,7 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
       </div>
 
       {/* Table */}
-      <div className="rounded-md border bg-white shadow-sm">
+      <div className="rounded-md border bg-card shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

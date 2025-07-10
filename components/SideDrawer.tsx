@@ -112,7 +112,7 @@ export function SideDrawer({ children }: SideDrawerProps) {
   const NavigationContent = () => (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-6 border-b bg-gradient-to-r from-blue-600 to-indigo-600">
+      <div className="p-6 border-b border-border bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-white/20 rounded-lg">
             <FileText className="h-6 w-6 text-white" />
@@ -125,7 +125,7 @@ export function SideDrawer({ children }: SideDrawerProps) {
       </div>
 
       {/* User Info */}
-      <div className="p-4 border-b bg-gray-50">
+      <div className="p-4 border-b border-border bg-muted/50">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
             <span className="text-white font-medium text-sm">
@@ -133,10 +133,10 @@ export function SideDrawer({ children }: SideDrawerProps) {
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
+            <p className="text-sm font-medium text-foreground truncate">
               {user?.name}
             </p>
-            <p className="text-xs text-gray-500">{user?.role}</p>
+            <p className="text-xs text-muted-foreground">{user?.role}</p>
           </div>
           <Badge variant="outline" className="text-xs">
             {user?.role}
@@ -146,7 +146,7 @@ export function SideDrawer({ children }: SideDrawerProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
           Main Menu
         </div>
         {filteredItems.slice(0, 3).map((item) => {
@@ -159,24 +159,24 @@ export function SideDrawer({ children }: SideDrawerProps) {
               href={item.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex items-center justify-between p-3 rounded-lg transition-all duration-200 group hover:bg-blue-50 hover:border-blue-200 border border-transparent",
-                isActive && "bg-blue-50 border-blue-200 shadow-sm"
+                "flex items-center justify-between p-3 rounded-lg transition-all duration-200 group hover:bg-accent hover:border-accent-foreground/20 border border-transparent",
+                isActive && "bg-accent border-accent-foreground/20 shadow-sm"
               )}
             >
               <div className="flex items-center space-x-3">
                 <Icon className={cn(
                   "h-5 w-5 transition-colors",
-                  isActive ? "text-blue-600" : "text-gray-500 group-hover:text-blue-600"
+                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
                 )} />
                 <div>
                   <p className={cn(
                     "text-sm font-medium transition-colors",
-                    isActive ? "text-blue-900" : "text-gray-700 group-hover:text-blue-900"
+                    isActive ? "text-foreground" : "text-foreground/80 group-hover:text-foreground"
                   )}>
                     {item.title}
                   </p>
                   {item.description && (
-                    <p className="text-xs text-gray-500 group-hover:text-blue-600">
+                    <p className="text-xs text-muted-foreground group-hover:text-primary">
                       {item.description}
                     </p>
                   )}
@@ -193,14 +193,14 @@ export function SideDrawer({ children }: SideDrawerProps) {
                 )}
                 <ChevronRight className={cn(
                   "h-4 w-4 transition-all duration-200",
-                  isActive ? "text-blue-600 transform rotate-90" : "text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1"
+                  isActive ? "text-primary transform rotate-90" : "text-muted-foreground group-hover:text-primary group-hover:translate-x-1"
                 )} />
               </div>
             </Link>
           );
         })}
 
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 mt-6">
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 mt-6">
           Management
         </div>
         {filteredItems.slice(3, 6).map((item) => {
@@ -213,24 +213,24 @@ export function SideDrawer({ children }: SideDrawerProps) {
               href={item.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex items-center justify-between p-3 rounded-lg transition-all duration-200 group hover:bg-blue-50 hover:border-blue-200 border border-transparent",
-                isActive && "bg-blue-50 border-blue-200 shadow-sm"
+                "flex items-center justify-between p-3 rounded-lg transition-all duration-200 group hover:bg-accent hover:border-accent-foreground/20 border border-transparent",
+                isActive && "bg-accent border-accent-foreground/20 shadow-sm"
               )}
             >
               <div className="flex items-center space-x-3">
                 <Icon className={cn(
                   "h-5 w-5 transition-colors",
-                  isActive ? "text-blue-600" : "text-gray-500 group-hover:text-blue-600"
+                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
                 )} />
                 <div>
                   <p className={cn(
                     "text-sm font-medium transition-colors",
-                    isActive ? "text-blue-900" : "text-gray-700 group-hover:text-blue-900"
+                    isActive ? "text-foreground" : "text-foreground/80 group-hover:text-foreground"
                   )}>
                     {item.title}
                   </p>
                   {item.description && (
-                    <p className="text-xs text-gray-500 group-hover:text-blue-600">
+                    <p className="text-xs text-muted-foreground group-hover:text-primary">
                       {item.description}
                     </p>
                   )}
@@ -247,14 +247,14 @@ export function SideDrawer({ children }: SideDrawerProps) {
                 )}
                 <ChevronRight className={cn(
                   "h-4 w-4 transition-all duration-200",
-                  isActive ? "text-blue-600 transform rotate-90" : "text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1"
+                  isActive ? "text-primary transform rotate-90" : "text-muted-foreground group-hover:text-primary group-hover:translate-x-1"
                 )} />
               </div>
             </Link>
           );
         })}
 
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 mt-6">
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 mt-6">
           System
         </div>
         {filteredItems.slice(6).map((item) => {
@@ -267,24 +267,24 @@ export function SideDrawer({ children }: SideDrawerProps) {
               href={item.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex items-center justify-between p-3 rounded-lg transition-all duration-200 group hover:bg-blue-50 hover:border-blue-200 border border-transparent",
-                isActive && "bg-blue-50 border-blue-200 shadow-sm"
+                "flex items-center justify-between p-3 rounded-lg transition-all duration-200 group hover:bg-accent hover:border-accent-foreground/20 border border-transparent",
+                isActive && "bg-accent border-accent-foreground/20 shadow-sm"
               )}
             >
               <div className="flex items-center space-x-3">
                 <Icon className={cn(
                   "h-5 w-5 transition-colors",
-                  isActive ? "text-blue-600" : "text-gray-500 group-hover:text-blue-600"
+                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
                 )} />
                 <div>
                   <p className={cn(
                     "text-sm font-medium transition-colors",
-                    isActive ? "text-blue-900" : "text-gray-700 group-hover:text-blue-900"
+                    isActive ? "text-foreground" : "text-foreground/80 group-hover:text-foreground"
                   )}>
                     {item.title}
                   </p>
                   {item.description && (
-                    <p className="text-xs text-gray-500 group-hover:text-blue-600">
+                    <p className="text-xs text-muted-foreground group-hover:text-primary">
                       {item.description}
                     </p>
                   )}
@@ -301,7 +301,7 @@ export function SideDrawer({ children }: SideDrawerProps) {
                 )}
                 <ChevronRight className={cn(
                   "h-4 w-4 transition-all duration-200",
-                  isActive ? "text-blue-600 transform rotate-90" : "text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1"
+                  isActive ? "text-primary transform rotate-90" : "text-muted-foreground group-hover:text-primary group-hover:translate-x-1"
                 )} />
               </div>
             </Link>
@@ -310,12 +310,12 @@ export function SideDrawer({ children }: SideDrawerProps) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t bg-gray-50">
+      <div className="p-4 border-t border-border bg-muted/50">
         <div className="text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             {config.appName} v{config.appVersion}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-muted-foreground/70 mt-1">
             © 2024 Your Company • {config.env.toUpperCase()}
           </p>
         </div>
