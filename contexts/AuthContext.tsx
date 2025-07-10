@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, AuthContextType, authenticateUser } from '@/lib/auth';
+import { analytics } from '@/lib/analytics';
+import { logger } from '@/lib/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -23,14 +25,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (authenticatedUser) {
       setUser(authenticatedUser);
       localStorage.setItem('user', JSON.stringify(authenticatedUser));
+      
+      // Track login event
+      analytics.identify(authenticatedUser.id, {
+        email: authenticatedUser.email,
+        role: authenticatedUser.role,
+      });
+      analytics.track('user_login', {
+        role: authenticatedUser.role,
+      });
+      
+      logger.info('User logged in successfully', { 
+        userId: authenticatedUser.id, 
+        role: authenticatedUser.role 
+      });
+      
       return true;
     }
+    
+    logger.warn('Login attempt failed', { email });
     return false;
   };
 
   const logout = () => {
+    const currentUser = user;
     setUser(null);
     localStorage.removeItem('user');
+    
+    if (currentUser) {
+      analytics.track('user_logout', {
+        role: currentUser.role,
+      });
+      logger.info('User logged out', { userId: currentUser.id });
+    }
   };
 
   const value: AuthContextType = {

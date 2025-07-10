@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  invoice-app-production:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_APP_ENV=production
+    env_file:
+      - ../.env.production
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.invoice-prod.rule=Host(`yourcompany.com`)"
+      - "traefik.http.routers.invoice-prod.tls=true"
+      - "traefik.http.routers.invoice-prod.tls.certresolver=letsencrypt"
+
+  # Optional: Database for production
+  postgres-production:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: invoice_production
+      POSTGRES_USER: invoice_user
+      POSTGRES_PASSWORD: production_password
+    volumes:
+      - postgres_production_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Optional: Redis for caching
+  redis-production:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_production_data:/data
+
+volumes:
+  postgres_production_data:
+  redis_production_data:

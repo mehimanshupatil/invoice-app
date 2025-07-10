@@ -29,7 +29,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { CalendarIcon, ArrowLeft, Download, FileText, FileSpreadsheet, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { getCustomers, createInvoice, type Invoice } from '@/lib/invoice-data';
