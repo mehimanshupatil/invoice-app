@@ -22,6 +22,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { config } from '@/lib/config';
+import { RupeeIcon } from '@/components/RupeeIcon';
 
 interface NavigationItem {
   title: string;
@@ -115,7 +116,7 @@ export function SideDrawer({ children }: SideDrawerProps) {
       <div className="p-6 border-b border-border bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-white/20 rounded-lg">
-            <FileText className="h-6 w-6 text-white" />
+            <RupeeIcon className="h-6 w-6 text-white" size={24} />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">Invoice Manager</h2>
