@@ -30,8 +30,8 @@ export default function InvoicesPage() {
         <div className="space-y-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
-              <p className="text-gray-600 mt-1">Manage and track all your invoices</p>
+              <h1 className="text-3xl font-bold text-foreground">Invoices</h1>
+              <p className="text-muted-foreground mt-1">Manage and track all your invoices</p>
             </div>
             {canCreate && (
               <Link href="/invoices/create">

@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
@@ -51,8 +51,8 @@ export default function LoginPage() {
               <Receipt className="h-6 w-6 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Invoice Manager</CardTitle>
-          <CardDescription className="text-gray-600">
+          <CardTitle className="text-2xl font-bold text-foreground">Invoice Manager</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Sign in to your account to manage invoices
           </CardDescription>
         </CardHeader>
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -100,13 +100,13 @@ export default function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2">Demo accounts:</p>
+          <div className="mt-6 p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground mb-2">Demo accounts:</p>
             <div className="space-y-1 text-xs">
               <p><strong>Admin:</strong> admin@company.com</p>
               <p><strong>Accountant:</strong> accountant@company.com</p>
               <p><strong>Viewer:</strong> viewer@company.com</p>
-              <p className="text-gray-500">Password: password123</p>
+              <p className="text-muted-foreground">Password: password123</p>
             </div>
           </div>
         </CardContent>

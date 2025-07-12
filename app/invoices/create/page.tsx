@@ -159,8 +159,8 @@ export default function CreateInvoicePage() {
               <span>Back</span>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Create Invoice</h1>
-              <p className="text-gray-600 mt-1">Generate a new invoice for your customer</p>
+              <h1 className="text-3xl font-bold text-foreground">Create Invoice</h1>
+              <p className="text-muted-foreground mt-1">Generate a new invoice for your customer</p>
             </div>
           </div>
 

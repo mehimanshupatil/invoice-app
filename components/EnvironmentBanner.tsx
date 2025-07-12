@@ -12,7 +12,7 @@ export function EnvironmentBanner() {
   }
 
   return (
-    <div className={`${getEnvironmentColor()} text-white py-2 px-4`}>
+    <div className={`${getEnvironmentColor()} text-white py-2 px-4 relative z-50`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
           {isStaging ? (
