@@ -78,13 +78,23 @@ export const mockInvoices: Invoice[] = [
 ];
 
 let invoiceData = [...mockInvoices];
+let customerData = [...mockCustomers];
 
 export const getInvoices = (): Invoice[] => {
   return invoiceData;
 };
 
 export const getCustomers = (): Customer[] => {
-  return mockCustomers;
+  return customerData;
+};
+
+export const createCustomer = (customer: Omit<Customer, 'id'>): Customer => {
+  const newCustomer: Customer = {
+    ...customer,
+    id: String(customerData.length + 1),
+  };
+  customerData.push(newCustomer);
+  return newCustomer;
 };
 
 export const createInvoice = (invoice: Omit<Invoice, 'id' | 'createdAt'>): Invoice => {

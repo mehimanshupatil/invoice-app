@@ -10,6 +10,9 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Select, 
   SelectContent, 
@@ -28,11 +31,10 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns/format';
-import { CalendarIcon, ArrowLeft, Download, FileText, FileSpreadsheet, Mail } from 'lucide-react';
+import { CalendarIcon, ArrowLeft, Download, FileText, FileSpreadsheet, Mail, Check, ChevronsUpDown, Plus, User } from 'lucide-react';
 import { toast } from 'sonner';
-import { getCustomers, createInvoice, type Invoice } from '@/lib/invoice-data';
+import { getCustomers, createInvoice, createCustomer, type Invoice, type Customer } from '@/lib/invoice-data';
 import { cn } from '@/lib/utils';
 
 const invoiceSchema = z.object({
@@ -47,16 +49,26 @@ const invoiceSchema = z.object({
   path: ['endDate'],
 });
 
+const customerSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Valid email is required'),
+  company: z.string().min(1, 'Company is required'),
+});
+
 type InvoiceFormData = z.infer<typeof invoiceSchema>;
+type CustomerFormData = z.infer<typeof customerSchema>;
 
 export default function CreateInvoicePage() {
   const router = useRouter();
-  const customers = getCustomers();
+  const [customers, setCustomers] = useState<Customer[]>(getCustomers());
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showNewCustomer, setShowNewCustomer] = useState(false);
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
 
   const {
     register,
@@ -67,6 +79,15 @@ export default function CreateInvoicePage() {
     reset,
   } = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceSchema),
+  });
+
+  const {
+    register: registerCustomer,
+    handleSubmit: handleSubmitCustomer,
+    formState: { errors: customerErrors },
+    reset: resetCustomer,
+  } = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
   });
 
   const watchedValues = watch();
@@ -95,6 +116,20 @@ export default function CreateInvoicePage() {
         const amount = calculateAmount(watchedValues.type, startDate, endDate);
         setValue('amount', amount);
       }
+    }
+  };
+
+  const onSubmitCustomer = async (data: CustomerFormData) => {
+    try {
+      const newCustomer = createCustomer(data);
+      setCustomers(getCustomers()); // Refresh customer list
+      setValue('customerId', newCustomer.id);
+      setSelectedCustomer(newCustomer.id);
+      setShowNewCustomer(false);
+      resetCustomer();
+      toast.success('Customer created successfully!');
+    } catch (error) {
+      toast.error('Failed to create customer');
     }
   };
 
@@ -145,6 +180,8 @@ export default function CreateInvoicePage() {
     toast.success('CSV downloaded successfully');
   };
 
+  const selectedCustomerData = customers.find(c => c.id === selectedCustomer);
+
   return (
     <ProtectedRoute allowedRoles={['Admin', 'Accountant']}>
       <Layout>
@@ -175,19 +212,68 @@ export default function CreateInvoicePage() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Customer Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="customer">Customer</Label>
-                  <Select onValueChange={(value) => setValue('customerId', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a customer" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id}>
-                          {customer.name} - {customer.company}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="customer">Customer</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowNewCustomer(true)}
+                      className="h-8 px-3"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      New Customer
+                    </Button>
+                  </div>
+                  <Popover open={customerOpen} onOpenChange={setCustomerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={customerOpen}
+                        className="w-full justify-between"
+                      >
+                        {selectedCustomerData
+                          ? `${selectedCustomerData.name} - ${selectedCustomerData.company}`
+                          : "Select customer..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search customers..." />
+                        <CommandList>
+                          <CommandEmpty>No customer found.</CommandEmpty>
+                          <CommandGroup>
+                            {customers.map((customer) => (
+                              <CommandItem
+                                key={customer.id}
+                                value={`${customer.name} ${customer.company} ${customer.email}`}
+                                onSelect={() => {
+                                  setSelectedCustomer(customer.id);
+                                  setValue('customerId', customer.id);
+                                  setCustomerOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedCustomer === customer.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{customer.name}</span>
+                                  <span className="text-sm text-muted-foreground">
+                                    {customer.company} • {customer.email}
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   {errors.customerId && (
                     <p className="text-sm text-red-600">{errors.customerId.message}</p>
                   )}
@@ -392,6 +478,75 @@ export default function CreateInvoicePage() {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* New Customer Dialog */}
+        <Dialog open={showNewCustomer} onOpenChange={setShowNewCustomer}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <User className="h-5 w-5 mr-2" />
+                Add New Customer
+              </DialogTitle>
+              <DialogDescription>
+                Create a new customer to add to your invoice
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleSubmitCustomer(onSubmitCustomer)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="customerName">Full Name</Label>
+                <Input
+                  id="customerName"
+                  placeholder="Enter customer name"
+                  {...registerCustomer('name')}
+                />
+                {customerErrors.name && (
+                  <p className="text-sm text-red-600">{customerErrors.name.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customerEmail">Email Address</Label>
+                <Input
+                  id="customerEmail"
+                  type="email"
+                  placeholder="Enter email address"
+                  {...registerCustomer('email')}
+                />
+                {customerErrors.email && (
+                  <p className="text-sm text-red-600">{customerErrors.email.message}</p>
+                )}
+              <div className="space-y-2">
+                <Label htmlFor="customerCompany">Company</Label>
+                <Input
+                  id="customerCompany"
+                  placeholder="Enter company name"
+                  {...registerCustomer('company')}
+                />
+                {customerErrors.company && (
+                  <p className="text-sm text-red-600">{customerErrors.company.message}</p>
+                )}
+              </div>
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowNewCustomer(false);
+                    resetCustomer();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Customer
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         </Dialog>
       </Layout>
