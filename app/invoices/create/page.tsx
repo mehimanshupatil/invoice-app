@@ -185,7 +185,7 @@ export default function CreateInvoicePage() {
   return (
     <ProtectedRoute allowedRoles={['Admin', 'Accountant']}>
       <Layout>
-        <div className="space-y-8">
+        <div className="space-y-8 px-2 sm:px-0">
           <div className="flex items-center space-x-4">
             <Button
               variant="outline"
@@ -201,7 +201,7 @@ export default function CreateInvoicePage() {
             </div>
           </div>
 
-          <Card className="max-w-2xl">
+          <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle>Invoice Details</CardTitle>
               <CardDescription>
@@ -305,7 +305,7 @@ export default function CreateInvoicePage() {
                 </div>
 
                 {/* Date Range */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Start Date</Label>
                     <Popover>
@@ -397,15 +397,16 @@ export default function CreateInvoicePage() {
                   )}
                 </div>
 
-                <div className="flex justify-end space-x-4">
+                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => router.back()}
+                    className="w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isLoading}>
+                  <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                     {isLoading ? 'Creating...' : 'Create Invoice'}
                   </Button>
                 </div>

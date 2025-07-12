@@ -12,7 +12,8 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Receipt, User, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
+import { RupeeIcon } from '@/components/RupeeIcon';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -38,7 +39,7 @@ export function Layout({ children }: LayoutProps) {
             <div className="flex items-center space-x-4">
               <SideDrawer />
               <Link href="/dashboard" className="flex items-center space-x-2">
-                <Receipt className="h-8 w-8 text-blue-600" />
+                <RupeeIcon className="h-8 w-8 text-blue-600" size={32} />
                 <span className="text-xl font-bold text-foreground">Invoice Manager</span>
               </Link>
             </div>

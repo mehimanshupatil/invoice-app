@@ -65,7 +65,7 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-8">
+        <div className="space-y-8 px-2 sm:px-0">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <Link href="/invoices">
                 <CardHeader>

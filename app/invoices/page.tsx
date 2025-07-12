@@ -27,7 +27,7 @@ export default function InvoicesPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-8">
+        <div className="space-y-8 px-2 sm:px-0">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Invoices</h1>
@@ -35,7 +35,7 @@ export default function InvoicesPage() {
             </div>
             {canCreate && (
               <Link href="/invoices/create">
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Invoice
                 </Button>

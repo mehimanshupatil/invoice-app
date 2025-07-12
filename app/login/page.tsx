@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, Receipt } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import { RupeeIcon } from '@/components/RupeeIcon';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
@@ -43,12 +44,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
-      <Card className="w-full max-w-md shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4 px-6 sm:px-4">
+      <Card className="w-full max-w-md shadow-xl mx-auto">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-blue-600 rounded-full">
-              <Receipt className="h-6 w-6 text-white" />
+              <RupeeIcon className="h-6 w-6 text-white" size={24} />
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">Invoice Manager</CardTitle>

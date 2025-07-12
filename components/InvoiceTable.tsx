@@ -294,23 +294,23 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 px-2 sm:px-0">
         <div className="flex-1">
           <Input
             placeholder="Search invoices..."
             value={globalFilter ?? ''}
             onChange={(event) => setGlobalFilter(event.target.value)}
-            className="max-w-sm"
+            className="w-full sm:max-w-sm"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Select
             value={(table.getColumn('customerName')?.getFilterValue() as string) ?? ''}
             onValueChange={(value) =>
               table.getColumn('customerName')?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Customer" />
             </SelectTrigger>
             <SelectContent>
@@ -326,7 +326,7 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
               table.getColumn('type')?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -342,7 +342,7 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
               table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -357,7 +357,7 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
       </div>
 
       {/* Table */}
-      <div className="rounded-md border bg-card shadow-sm">
+      <div className="rounded-md border bg-card shadow-sm overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -395,7 +395,7 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 sm:px-0">
         <div className="flex-1 text-sm text-muted-foreground">
           Showing {table.getFilteredRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s).
         </div>
