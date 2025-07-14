@@ -61,6 +61,13 @@ const navigationItems: NavigationItem[] = [
     badge: 'Soon',
   },
   {
+    title: 'User Management',
+    href: '/users',
+    icon: Users,
+    description: 'Manage system users',
+    allowedRoles: ['Admin'],
+  },
+  {
     title: 'Reports',
     href: '/reports',
     icon: BarChart3,
