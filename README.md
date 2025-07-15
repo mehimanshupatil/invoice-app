@@ -5,6 +5,7 @@ A modern invoice management system with role-based access control and multi-envi
 ## Features
 
 - 🔐 Role-based authentication (Admin, Accountant, Viewer)
+- 🗄️ MySQL database integration with user management
 - 📊 Dashboard with analytics and statistics
 - 📄 Invoice creation and management
 - 🎨 Modern UI with Tailwind CSS and shadcn/ui
@@ -38,6 +39,32 @@ Copy the appropriate environment file:
 - `.env.local` - Development
 - `.env.staging` - Staging
 - `.env.production` - Production
+
+## Database Setup
+
+### MySQL Configuration
+
+1. Install MySQL and create a database
+2. Update the database configuration in your environment files:
+   ```
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   DB_NAME=invoice_manager
+   ```
+3. Visit `/users` page (Admin only) to initialize the database
+4. The system will automatically create tables and default users
+
+### API Endpoints
+
+- `GET /api/users` - Get all users
+- `POST /api/users` - Create new user
+- `GET /api/users/[id]` - Get specific user
+- `PUT /api/users/[id]` - Update user
+- `DELETE /api/users/[id]` - Delete user
+- `GET /api/database/init` - Check database connection
+- `POST /api/database/init` - Initialize database tables
 
 ## Docker Deployment
 
