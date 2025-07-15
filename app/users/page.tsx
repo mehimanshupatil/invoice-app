@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,32 +52,32 @@ import {
   CheckCircle, 
   XCircle, 
   Users,
-  Loader2,
   RefreshCw
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { format } from 'date-fns/format';
-import { api } from '@/lib/api';
-import { useGlobalLoader } from '@/hooks/useGlobalLoader';
-
-interface DatabaseUser {
-  id: string;
-  email: string;
-  name: string;
-  role: 'Admin' | 'Accountant' | 'Viewer';
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { 
+  useUsers, 
+  useCreateUser, 
+  useUpdateUser, 
+  useDeleteUser,
+  type DatabaseUser,
+  type CreateUserData 
+} from '@/lib/api/users';
+import { useDatabaseStatus, useInitializeDatabase } from '@/lib/api/database';
 
 export default function UsersPage() {
-  const { isLoading } = useGlobalLoader();
-  const [users, setUsers] = useState<DatabaseUser[]>([]);
-  const [localLoading, setLocalLoading] = useState(true);
-  const [dbConnected, setDbConnected] = useState<boolean | null>(null);
+  // React Query hooks
+  const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useUsers();
+  const { data: dbStatus, isLoading: dbStatusLoading, refetch: refetchDbStatus } = useDatabaseStatus();
+  const initializeDb = useInitializeDatabase();
+  const createUserMutation = useCreateUser();
+  const updateUserMutation = useUpdateUser();
+  const deleteUserMutation = useDeleteUser();
+  
+  // Local state
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateUserData & { is_active: boolean }>({
     email: '',
     name: '',
     password: '',
@@ -84,98 +85,28 @@ export default function UsersPage() {
     is_active: true
   });
 
-  // Check database connection
-  const checkConnection = async () => {
-    try {
-      const response = await api.get('/api/database/init', { showLoader: false });
-      const data = await response.json();
-      setDbConnected(data.connected);
-      if (!data.connected) {
-        toast.error('Database connection failed');
-      }
-    } catch (error) {
-      setDbConnected(false);
-      toast.error('Failed to check database connection');
-    }
-  };
-
-  // Initialize database
-  const initializeDatabase = async () => {
-    try {
-      const response = await api.post('/api/database/init');
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success('Database initialized successfully');
-        setDbConnected(true);
-        loadUsers();
-      } else {
-        toast.error(data.message || 'Failed to initialize database');
-      }
-    } catch (error) {
-      toast.error('Failed to initialize database');
-    }
-  };
-
-  // Load users from database
-  const loadUsers = async () => {
-    try {
-      setLocalLoading(true);
-      const response = await api.get('/api/users');
-      const data = await response.json();
-      
-      if (data.success) {
-        setUsers(data.data);
-      } else {
-        toast.error(data.message || 'Failed to load users');
-      }
-    } catch (error) {
-      toast.error('Failed to load users');
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
   // Create or update user
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      const response = editingUser 
-        ? await api.put(`/api/users/${editingUser.id}`, formData)
-        : await api.post('/api/users', formData);
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success(data.message);
-        setShowCreateDialog(false);
-        setEditingUser(null);
-        setFormData({ email: '', name: '', password: '', role: 'Viewer', is_active: true });
-        loadUsers();
-      } else {
-        toast.error(data.message || 'Operation failed');
-      }
-    } catch (error) {
-      toast.error('Operation failed');
+    if (editingUser) {
+      await updateUserMutation.mutateAsync({
+        id: editingUser.id,
+        ...formData,
+      });
+    } else {
+      await createUserMutation.mutateAsync(formData);
     }
+    
+    // Reset form and close dialog
+    setShowCreateDialog(false);
+    setEditingUser(null);
+    setFormData({ email: '', name: '', password: '', role: 'Viewer', is_active: true });
   };
 
   // Delete user
   const handleDelete = async (userId: string) => {
-    try {
-      const response = await api.delete(`/api/users/${userId}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success('User deleted successfully');
-        loadUsers();
-      } else {
-        toast.error(data.message || 'Failed to delete user');
-      }
-    } catch (error) {
-      toast.error('Failed to delete user');
-    }
+    await deleteUserMutation.mutateAsync(userId);
   };
 
   // Edit user
@@ -191,15 +122,11 @@ export default function UsersPage() {
     setShowCreateDialog(true);
   };
 
-  useEffect(() => {
-    checkConnection();
-  }, []);
-
-  useEffect(() => {
-    if (dbConnected) {
-      loadUsers();
-    }
-  }, [dbConnected]);
+  const handleInitializeDatabase = async () => {
+    await initializeDb.mutateAsync();
+    refetchDbStatus();
+    refetchUsers();
+  };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -222,13 +149,14 @@ export default function UsersPage() {
             <div className="flex space-x-2">
               <Button
                 variant="outline"
-                onClick={checkConnection}
+                onClick={() => refetchDbStatus()}
+                disabled={dbStatusLoading}
                 className="flex items-center space-x-2"
               >
                 <RefreshCw className="h-4 w-4" />
                 <span>Check Connection</span>
               </Button>
-              {dbConnected && (
+              {dbStatus?.connected && (
                 <Button
                   onClick={() => setShowCreateDialog(true)}
                   className="flex items-center space-x-2"
@@ -251,30 +179,33 @@ export default function UsersPage() {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {dbConnected === null ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : dbConnected ? (
+                  {dbStatusLoading ? (
+                    <LoadingSpinner size="sm" />
+                  ) : dbStatus?.connected ? (
                     <CheckCircle className="h-4 w-4 text-green-600" />
                   ) : (
                     <XCircle className="h-4 w-4 text-red-600" />
                   )}
                   <span>
-                    {dbConnected === null 
+                    {dbStatusLoading
                       ? 'Checking connection...' 
-                      : dbConnected 
-                        ? 'Connected to MySQL database' 
-                        : 'Database connection failed'
+                      : dbStatus?.message || 'Unknown status'
                     }
                   </span>
                 </div>
-                {!dbConnected && dbConnected !== null && (
-                  <Button onClick={initializeDatabase} variant="outline">
+                {!dbStatus?.connected && !dbStatusLoading && (
+                  <Button 
+                    onClick={handleInitializeDatabase} 
+                    variant="outline"
+                    disabled={initializeDb.isPending}
+                  >
+                    {initializeDb.isPending && <LoadingSpinner size="sm" className="mr-2" />}
                     Initialize Database
                   </Button>
                 )}
               </div>
               
-              {!dbConnected && (
+              {!dbStatus?.connected && !dbStatusLoading && (
                 <Alert className="mt-4">
                   <AlertDescription>
                     Make sure your MySQL database is running and the connection details in your environment variables are correct.
@@ -287,7 +218,7 @@ export default function UsersPage() {
           </Card>
 
           {/* Users Table */}
-          {dbConnected && (
+          {dbStatus?.connected && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -299,10 +230,9 @@ export default function UsersPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {localLoading ? (
+                {usersLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                    <span className="ml-2">Loading users...</span>
+                    <LoadingSpinner size="lg" text="Loading users..." />
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -340,6 +270,7 @@ export default function UsersPage() {
                                 <Button
                                   variant="outline"
                                   size="sm"
+                                  disabled={updateUserMutation.isPending}
                                   onClick={() => handleEdit(user)}
                                 >
                                   <Edit className="h-4 w-4" />
@@ -361,8 +292,12 @@ export default function UsersPage() {
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                                       <AlertDialogAction
                                         onClick={() => handleDelete(user.id)}
+                                        disabled={deleteUserMutation.isPending}
                                         className="bg-red-600 hover:bg-red-700"
                                       >
+                                        {deleteUserMutation.isPending && (
+                                          <LoadingSpinner size="sm" className="mr-2" />
+                                        )}
                                         Delete
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
@@ -475,6 +410,9 @@ export default function UsersPage() {
                     Cancel
                   </Button>
                   <Button type="submit">
+                    {(createUserMutation.isPending || updateUserMutation.isPending) && (
+                      <LoadingSpinner size="sm" className="mr-2" />
+                    )}
                     {editingUser ? 'Update User' : 'Create User'}
                   </Button>
                 </div>
