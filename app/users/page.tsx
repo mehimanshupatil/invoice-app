@@ -56,6 +56,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns/format';
+import { api } from '@/lib/api';
+import { useGlobalLoader } from '@/hooks/useGlobalLoader';
 
 interface DatabaseUser {
   id: string;
@@ -68,8 +70,9 @@ interface DatabaseUser {
 }
 
 export default function UsersPage() {
+  const { isLoading } = useGlobalLoader();
   const [users, setUsers] = useState<DatabaseUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(true);
   const [dbConnected, setDbConnected] = useState<boolean | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null);
@@ -84,7 +87,7 @@ export default function UsersPage() {
   // Check database connection
   const checkConnection = async () => {
     try {
-      const response = await fetch('/api/database/init');
+      const response = await api.get('/api/database/init', { showLoader: false });
       const data = await response.json();
       setDbConnected(data.connected);
       if (!data.connected) {
@@ -99,7 +102,7 @@ export default function UsersPage() {
   // Initialize database
   const initializeDatabase = async () => {
     try {
-      const response = await fetch('/api/database/init', { method: 'POST' });
+      const response = await api.post('/api/database/init');
       const data = await response.json();
       
       if (data.success) {
@@ -117,8 +120,8 @@ export default function UsersPage() {
   // Load users from database
   const loadUsers = async () => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/users');
+      setLocalLoading(true);
+      const response = await api.get('/api/users');
       const data = await response.json();
       
       if (data.success) {
@@ -129,7 +132,7 @@ export default function UsersPage() {
     } catch (error) {
       toast.error('Failed to load users');
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
@@ -138,14 +141,9 @@ export default function UsersPage() {
     e.preventDefault();
     
     try {
-      const url = editingUser ? `/api/users/${editingUser.id}` : '/api/users';
-      const method = editingUser ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      const response = editingUser 
+        ? await api.put(`/api/users/${editingUser.id}`, formData)
+        : await api.post('/api/users', formData);
       
       const data = await response.json();
       
@@ -166,7 +164,7 @@ export default function UsersPage() {
   // Delete user
   const handleDelete = async (userId: string) => {
     try {
-      const response = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+      const response = await api.delete(`/api/users/${userId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -301,7 +299,7 @@ export default function UsersPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {loading ? (
+                {localLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin" />
                     <span className="ml-2">Loading users...</span>

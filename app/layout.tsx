@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Toaster } from '@/components/ui/sonner';
+import { GlobalLoader } from '@/components/GlobalLoader';
+import { useGlobalLoader } from '@/hooks/useGlobalLoader';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,11 +42,24 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
+            <GlobalLoaderWrapper>
             {children}
+            </GlobalLoaderWrapper>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
+  );
+}
+
+function GlobalLoaderWrapper({ children }: { children: React.ReactNode }) {
+  const { isLoading } = useGlobalLoader();
+  
+  return (
+    <>
+      {children}
+      <GlobalLoader isLoading={isLoading} />
+    </>
   );
 }
