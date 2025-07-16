@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useLogin, isAuthenticated } from '@/lib/api/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,30 +16,26 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const loginMutation = useLogin();
   const router = useRouter();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        toast.success('Login successful!');
-        router.push('/dashboard');
-      } else {
-        setError('Invalid credentials. Please try again.');
-        toast.error('Login failed');
-      }
+      await loginMutation.mutateAsync({ email, password });
+      router.push('/dashboard');
     } catch (err) {
-      setError('An error occurred. Please try again.');
-      toast.error('An error occurred');
-    } finally {
-      setIsLoading(false);
+      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
     }
   };
 
@@ -98,7 +94,7 @@ export default function LoginPage() {
               </Alert>
             )}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
           <div className="mt-6 p-4 bg-muted rounded-lg">

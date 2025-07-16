@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserModel } from '@/lib/models/User';
 import { logger } from '@/lib/logger';
+import { withAuth, withAdminRole, AuthenticatedRequest } from '@/lib/auth/middleware';
 
 // GET /api/users - Get all users
-export async function GET(request: NextRequest) {
+async function getUsers(request: AuthenticatedRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get('role');
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/users - Create new user
-export async function POST(request: NextRequest) {
+async function createUser(request: AuthenticatedRequest) {
   try {
     const body = await request.json();
     const { email, name, password, role } = body;
@@ -128,3 +129,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(getUsers);
+export const POST = withAdminRole(createUser);

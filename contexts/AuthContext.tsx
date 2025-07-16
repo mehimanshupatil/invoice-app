@@ -1,76 +1,58 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, AuthContextType, authenticateUser } from '@/lib/auth';
-import { analytics } from '@/lib/analytics';
-import { logger } from '@/lib/logger';
+import { createContext, useContext, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCurrentUser, useLogin, useLogout, type User } from '@/lib/api/auth';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+
+export interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
-  }, []);
+  const router = useRouter();
+  const { data: user, isLoading, error } = useCurrentUser();
+  const loginMutation = useLogin();
+  const logoutMutation = useLogout();
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const authenticatedUser = await authenticateUser(email, password);
-    if (authenticatedUser) {
-      setUser(authenticatedUser);
-      localStorage.setItem('user', JSON.stringify(authenticatedUser));
-      
-      // Track login event
-      analytics.identify(authenticatedUser.id, {
-        email: authenticatedUser.email,
-        role: authenticatedUser.role,
-      });
-      analytics.track('user_login', {
-        role: authenticatedUser.role,
-      });
-      
-      logger.info('User logged in successfully', { 
-        userId: authenticatedUser.id, 
-        role: authenticatedUser.role 
-      });
-      
+    try {
+      await loginMutation.mutateAsync({ email, password });
       return true;
+    } catch (error) {
+      return false;
     }
-    
-    logger.warn('Login attempt failed', { email });
-    return false;
   };
 
   const logout = () => {
-    const currentUser = user;
-    setUser(null);
-    localStorage.removeItem('user');
-    
-    if (currentUser) {
-      analytics.track('user_logout', {
-        role: currentUser.role,
-      });
-      logger.info('User logged out', { userId: currentUser.id });
-    }
+    logoutMutation.mutate();
+    router.push('/login');
   };
 
+  // Redirect to login if authentication fails
+  useEffect(() => {
+    if (error && !isLoading) {
+      router.push('/login');
+    }
+  }, [error, isLoading, router]);
+
   const value: AuthContextType = {
-    user,
+    user: user || null,
     login,
     logout,
     isAuthenticated: !!user,
+    isLoading: isLoading || loginMutation.isPending || logoutMutation.isPending,
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }

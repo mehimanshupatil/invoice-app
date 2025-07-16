@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserModel } from '@/lib/models/User';
 import { logger } from '@/lib/logger';
+import { withAuth, withAdminRole, AuthenticatedRequest } from '@/lib/auth/middleware';
 
 // GET /api/users/[id] - Get user by ID
-export async function GET(
-  request: NextRequest,
+async function getUser(
+  request: AuthenticatedRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -42,8 +43,8 @@ export async function GET(
 }
 
 // PUT /api/users/[id] - Update user
-export async function PUT(
-  request: NextRequest,
+async function updateUser(
+  request: AuthenticatedRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -129,8 +130,8 @@ export async function PUT(
 }
 
 // DELETE /api/users/[id] - Delete user (soft delete)
-export async function DELETE(
-  request: NextRequest,
+async function deleteUser(
+  request: AuthenticatedRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -163,3 +164,7 @@ export async function DELETE(
     );
   }
 }
+
+export const GET = withAuth(getUser);
+export const PUT = withAdminRole(updateUser);
+export const DELETE = withAdminRole(deleteUser);
