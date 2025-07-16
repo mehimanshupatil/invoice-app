@@ -48,14 +48,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { TablePagination } from '@/components/TablePagination';
 import { 
   Download, 
   Mail, 
   MoreHorizontal, 
   Trash2, 
   ArrowUpDown,
-  ChevronLeft,
-  ChevronRight,
   FileText,
   FileSpreadsheet
 } from 'lucide-react';
@@ -76,6 +75,10 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const getPermissions = () => {
     switch (user?.role) {
@@ -278,16 +281,13 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
     globalFilterFn: 'includesString',
     state: {
       sorting,
       columnFilters,
       globalFilter,
-    },
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
+      pagination,
     },
   });
 
@@ -395,31 +395,14 @@ export function InvoiceTable({ invoices, onInvoicesChange }: InvoiceTableProps) 
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 sm:px-0">
-        <div className="flex-1 text-sm text-muted-foreground">
-          Showing {table.getFilteredRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s).
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <TablePagination
+        currentPage={table.getState().pagination.pageIndex + 1}
+        totalPages={table.getPageCount()}
+        pageSize={table.getState().pagination.pageSize}
+        totalItems={table.getFilteredRowModel().rows.length}
+        onPageChange={(page) => table.setPageIndex(page - 1)}
+        onPageSizeChange={(pageSize) => table.setPageSize(pageSize)}
+      />
     </div>
   );
 }
