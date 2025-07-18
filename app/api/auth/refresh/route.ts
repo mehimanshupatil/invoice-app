@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Set new cookies
-    setAuthCookies(newTokens);
+    await setAuthCookies(newTokens);
 
     // Remove sensitive data
     const { password_hash, ...safeUser } = user as any;

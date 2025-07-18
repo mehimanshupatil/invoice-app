@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger';
 export async function POST(request: NextRequest) {
   try {
     // Clear auth cookies
-    clearAuthCookies();
+    await clearAuthCookies();
 
     logger.info('User logged out successfully');
 

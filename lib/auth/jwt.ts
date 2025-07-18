@@ -120,8 +120,8 @@ export function extractRefreshTokenFromRequest(request: NextRequest): string | n
 }
 
 // Set auth cookies
-export function setAuthCookies(tokens: TokenPair) {
-  const cookieStore = cookies();
+export async function setAuthCookies(tokens: TokenPair) {
+  const cookieStore = await cookies();
   
   // Set access token cookie (httpOnly, secure)
   cookieStore.set('accessToken', tokens.accessToken, {
@@ -143,8 +143,8 @@ export function setAuthCookies(tokens: TokenPair) {
 }
 
 // Clear auth cookies
-export function clearAuthCookies() {
-  const cookieStore = cookies();
+export async function clearAuthCookies() {
+  const cookieStore = await cookies();
   
   cookieStore.set('accessToken', '', {
     httpOnly: true,

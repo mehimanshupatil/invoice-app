@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser, useLogin, useLogout, type User } from '@/lib/api/auth';
+import { useCurrentUser, useLogin, useLogout } from '@/lib/api/auth';
+import type { User } from '@/lib/api/auth';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export interface AuthContextType {

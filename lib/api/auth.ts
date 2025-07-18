@@ -87,9 +87,6 @@ export const useLogin = () => {
       // Set user data in cache
       queryClient.setQueryData(['auth', 'user'], data.user);
       
-      // Store access token in localStorage for API calls
-      localStorage.setItem('accessToken', data.tokens.accessToken);
-      
       toast.success(data.message || 'Login successful!');
     },
     onError: (error: Error) => {
@@ -106,9 +103,6 @@ export const useLogout = () => {
     onSuccess: () => {
       // Clear all cached data
       queryClient.clear();
-      
-      // Remove access token
-      localStorage.removeItem('accessToken');
       
       toast.success('Logout successful!');
     },
@@ -127,13 +121,10 @@ export const useRefreshToken = () => {
       // Update user data in cache
       queryClient.setQueryData(['auth', 'user'], data.user);
       
-      // Update access token
-      localStorage.setItem('accessToken', data.tokens.accessToken);
     },
     onError: (error: Error) => {
       // Clear cache and redirect to login on refresh failure
       queryClient.clear();
-      localStorage.removeItem('accessToken');
       
       // Don't show error toast for automatic refresh attempts
       console.error('Token refresh failed:', error.message);
@@ -154,15 +145,4 @@ export const useCurrentUser = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-};
-
-// Helper function to get access token
-export const getAccessToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken');
-};
-
-// Helper function to check if user is authenticated
-export const isAuthenticated = (): boolean => {
-  return !!getAccessToken();
 };

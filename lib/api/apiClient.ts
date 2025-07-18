@@ -1,4 +1,3 @@
-import { getAccessToken } from './auth';
 
 interface ApiOptions extends RequestInit {
   requireAuth?: boolean;
@@ -21,14 +20,6 @@ class ApiClient {
       ...fetchOptions.headers,
     };
 
-    // Add authorization header if required and token is available
-    if (requireAuth) {
-      const token = getAccessToken();
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-    }
-
     const config: RequestInit = {
       ...fetchOptions,
       headers,
@@ -46,12 +37,8 @@ class ApiClient {
           });
           
           if (refreshResponse.ok) {
-            const refreshData = await refreshResponse.json();
-            localStorage.setItem('accessToken', refreshData.tokens.accessToken);
-            
-            // Retry original request with new token
-            headers.Authorization = `Bearer ${refreshData.tokens.accessToken}`;
-            const retryResponse = await fetch(url, { ...config, headers });
+            // Retry original request (cookies will be updated automatically)
+            const retryResponse = await fetch(url, config);
             
             if (!retryResponse.ok) {
               throw new Error(`HTTP ${retryResponse.status}: ${retryResponse.statusText}`);
@@ -60,13 +47,11 @@ class ApiClient {
             return await retryResponse.json();
           } else {
             // Refresh failed, redirect to login
-            localStorage.removeItem('accessToken');
             window.location.href = '/login';
             throw new Error('Authentication expired');
           }
         } catch (refreshError) {
           // Refresh failed, redirect to login
-          localStorage.removeItem('accessToken');
           window.location.href = '/login';
           throw new Error('Authentication expired');
         }
