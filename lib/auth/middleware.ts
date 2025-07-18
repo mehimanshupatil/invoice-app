@@ -43,7 +43,7 @@ export function withAuth(handler: (req: AuthenticatedRequest) => Promise<NextRes
 }
 
 // Middleware to check user roles
-export function withRole(roles: string[]) {
+export function withRole(roles: ('Admin' | 'Accountant' | 'Viewer')[]) {
   return function (handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
     return withAuth(async (request: AuthenticatedRequest) => {
       if (!request.user) {

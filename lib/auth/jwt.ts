@@ -18,6 +18,10 @@ export interface JWTPayload {
   email: string;
   role: 'Admin' | 'Accountant' | 'Viewer';
   type: 'access' | 'refresh';
+  iat?: number;
+  exp?: number;
+  iss?: string;
+  aud?: string;
 }
 
 export interface TokenPair {
@@ -29,8 +33,10 @@ export interface TokenPair {
 export function generateAccessToken(payload: Omit<JWTPayload, 'type'>): string {
   return jwt.sign(
     {
-      ...payload,
-      type: 'access',
+      userId: payload.userId,
+      email: payload.email,
+      role: payload.role,
+      type: 'access' as const,
     },
     JWT_SECRET,
     {
@@ -45,8 +51,10 @@ export function generateAccessToken(payload: Omit<JWTPayload, 'type'>): string {
 export function generateRefreshToken(payload: Omit<JWTPayload, 'type'>): string {
   return jwt.sign(
     {
-      ...payload,
-      type: 'refresh',
+      userId: payload.userId,
+      email: payload.email,
+      role: payload.role,
+      type: 'refresh' as const,
     },
     JWT_REFRESH_SECRET,
     {
@@ -58,7 +66,7 @@ export function generateRefreshToken(payload: Omit<JWTPayload, 'type'>): string 
 }
 
 // Generate token pair
-export function generateTokenPair(payload: Omit<JWTPayload, 'type'>): TokenPair {
+export function generateTokenPair(payload: Omit<JWTPayload, 'type' | 'iat' | 'exp' | 'iss' | 'aud'>): TokenPair {
   return {
     accessToken: generateAccessToken(payload),
     refreshToken: generateRefreshToken(payload),
@@ -71,13 +79,22 @@ export function verifyAccessToken(token: string): JWTPayload | null {
     const decoded = jwt.verify(token, JWT_SECRET, {
       issuer: JWT_CONFIG.issuer,
       audience: JWT_CONFIG.audience,
-    }) as JWTPayload;
+    }) as jwt.JwtPayload & JWTPayload;
 
     if (decoded.type !== 'access') {
       return null;
     }
 
-    return decoded;
+    return {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+      type: decoded.type,
+      iat: decoded.iat,
+      exp: decoded.exp,
+      iss: decoded.iss,
+      aud: decoded.aud,
+    };
   } catch (error) {
     return null;
   }
@@ -89,13 +106,22 @@ export function verifyRefreshToken(token: string): JWTPayload | null {
     const decoded = jwt.verify(token, JWT_REFRESH_SECRET, {
       issuer: JWT_CONFIG.issuer,
       audience: JWT_CONFIG.audience,
-    }) as JWTPayload;
+    }) as jwt.JwtPayload & JWTPayload;
 
     if (decoded.type !== 'refresh') {
       return null;
     }
 
-    return decoded;
+    return {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+      type: decoded.type,
+      iat: decoded.iat,
+      exp: decoded.exp,
+      iss: decoded.iss,
+      aud: decoded.aud,
+    };
   } catch (error) {
     return null;
   }
