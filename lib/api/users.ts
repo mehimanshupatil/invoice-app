@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { apiClient } from './apiClient';
 
 export interface DatabaseUser {
   id: string;
@@ -29,64 +30,27 @@ export interface UpdateUserData {
 
 // API functions
 const fetchUsers = async (): Promise<DatabaseUser[]> => {
-  const response = await fetch('/api/users');
-  if (!response.ok) {
-    throw new Error('Failed to fetch users');
-  }
-  const data = await response.json();
+  const data = await apiClient.get<{ data: DatabaseUser[] }>('/api/users');
   return data.data;
 };
 
 const fetchUser = async (id: string): Promise<DatabaseUser> => {
-  const response = await fetch(`/api/users/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch user');
-  }
-  const data = await response.json();
+  const data = await apiClient.get<{ data: DatabaseUser }>(`/api/users/${id}`);
   return data.data;
 };
 
 const createUser = async (userData: CreateUserData): Promise<DatabaseUser> => {
-  const response = await fetch('/api/users', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to create user');
-  }
-  
-  const data = await response.json();
+  const data = await apiClient.post<{ data: DatabaseUser }>('/api/users', userData);
   return data.data;
 };
 
 const updateUser = async ({ id, ...userData }: UpdateUserData & { id: string }): Promise<DatabaseUser> => {
-  const response = await fetch(`/api/users/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to update user');
-  }
-  
-  const data = await response.json();
+  const data = await apiClient.put<{ data: DatabaseUser }>(`/api/users/${id}`, userData);
   return data.data;
 };
 
 const deleteUser = async (id: string): Promise<void> => {
-  const response = await fetch(`/api/users/${id}`, {
-    method: 'DELETE',
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to delete user');
-  }
+  await apiClient.delete(`/api/users/${id}`);
 };
 
 // React Query hooks
